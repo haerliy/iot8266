@@ -9,21 +9,36 @@ int main(void)
 	u8 len;	
 	u16 times=0;
 	
+	uint8_t rx_len = 0;                
+	uint8_t rx_data[200] = {0};        
+	uint8_t tx_data[100] = "AT\r\n";   
+  
     HAL_Init();                    	 	//初始化HAL库    
     Stm32_Clock_Init(RCC_PLL_MUL9);   	//设置时钟,72M
 	delay_init(72);               		//初始化延时函数
-	uart_init(115200);					//初始化串口
+	uart_init();					//初始化串口
 	LED_Init();							//初始化LED	
 	//KEY_Init();							//初始化按键
 	printf("Please enter data, end with Enter \r\n");  
+	  
+	USART2_StartRx();   
+	USART2_Transmit(tx_data, sizeof(tx_data), 500);
     while(1)
     {
-			
+		rx_len = USART2_Receive(rx_data);      
+		if (rx_len >0)                         
+		{
+			printf("Receive: %s\n\r", rx_data);
+			USART2_ClearBuf();                 
+			rx_len = 0;                        
+		}
+
+		
        if(USART_RX_STA&0x8000)
 		{					   
 			len=USART_RX_STA&0x3fff;//得到此次接收到的数据长度
 			printf("\r\n The message you send is:\r\n");
-			HAL_UART_Transmit(&UART1_Handler,(uint8_t*)USART_RX_BUF,len,1000);	//发送接收到的数据
+			HAL_UART_Transmit(&UART1_Handler,(uint8_t*)USART1_RXDATA_BUF,len,1000);	//发送接收到的数据
 			while(__HAL_UART_GET_FLAG(&UART1_Handler,UART_FLAG_TC)!=SET);		//等待发送结束
 			printf("\r\n\r\n");//插入换行
 			USART_RX_STA=0;
