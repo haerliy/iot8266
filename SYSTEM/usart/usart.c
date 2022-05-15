@@ -200,7 +200,7 @@ void USART1_IRQHandler(void)
 
 void USART2_StartRx(void)
 {
-	HAL_UART_Receive_IT(&UART2_Handler, (uint8_t*)Uart2RxBuffer, 1);
+	HAL_UART_Receive_IT(&UART2_Handler, (uint8_t*)Uart2RxBuffer, Uart2RXBUFFERSIZE);
 }
 
 uint8_t USART2_Receive(uint8_t *rx_data)
@@ -222,8 +222,23 @@ void USART2_ClearBuf(void)
 
 void USART2_IRQHandler(void)
 {
-  HAL_UART_IRQHandler(&UART2_Handler);
+	HAL_UART_IRQHandler(&UART2_Handler);
+//	u32 timeout=0;
+//	HAL_UART_IRQHandler(&UART2_Handler);	//调用HAL库中断处理公用函数
+//	timeout=0;
+//    while (HAL_UART_GetState(&UART2_Handler) != HAL_UART_STATE_READY)//等待就绪
+//	{
+//		timeout++;////超时处理
+//		if(timeout>HAL_MAX_DELAY) break;		
+//	}
+//	timeout=0;
+//	while(HAL_UART_Receive_IT(&UART2_Handler, (u8 *)Uart2RxBuffer, Uart2RXBUFFERSIZE) != HAL_OK)//一次处理完成之后，重新开启中断并设置RxXferCount为1
+//	{
+//		timeout++; //超时处理
+//		if(timeout>HAL_MAX_DELAY) break;	
+//	}
 }
+
 
 #endif	
 
